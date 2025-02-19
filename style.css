@@ -103,6 +103,8 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    top: 10%;
+    transform: translateY(-10%);
     white-space: nowrap;
     bottom: 16px;
     padding: 0px 16px 0px 40px;
