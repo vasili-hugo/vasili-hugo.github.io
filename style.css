@@ -6,7 +6,7 @@
 
   #controls {
     position: absolute;
-    bottom: 16px;
+    top: 16px;
     left: 16px;
     max-width: unset;
     transform: unset;
@@ -102,9 +102,8 @@
     background-color: #fff;
     position: absolute;
     left: 50%;
-    transform: translateX(-25%);
-    top: 10%;
-    transform: translateY(-10%);
+    transform: translateX(-50%);
+    bottom: 25%;
     white-space: nowrap;
     bottom: 16px;
     padding: 0px 16px 0px 40px;
