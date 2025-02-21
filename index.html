@@ -13,14 +13,13 @@
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 
     <model-viewer id="dimension-demo" ar ar-modes="webxr scene-viewer quick-look" camera-controls tone-mapping="neutral"
-        poster="poster.webp"  camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto"
-        shadow-intensity="0.5" touch-action="pan-x" src="/001.glb"
-        alt="Modelo 001">
+        poster="poster.webp" camera-orbit="-30deg auto auto" max-camera-orbit="auto 100deg auto" shadow-intensity="0.5"
+        touch-action="pan-x" src="/a001.glb" alt="Modelo 001">
         <div class="progress-bar hide" slot="progress-bar">
             <div class="update-bar"></div>
         </div>
         <button slot="ar-button" id="ar-button">View in your space</button>
-       
+
 
 
 
@@ -46,17 +45,36 @@
         <div id="controls" class="dim">
             <label for="src">Objeto:</label>
             <select id="src">
-                <option value="/001.glb">001</option>
-                <option value="/002.glb">002</option>
-                <option value="/003.glb">003</option>
-                <option value="/004.glb">004</option>
-                <option value="/005.glb">005</option>
-                <option value="/006.glb">006</option>
+                <option value="/a001.glb">001</option>
+                <option value="/a002.glb">002</option>
+                <option value="/a003.glb">003</option>
+                <option value="/a004.glb">004</option>
+                <option value="/a005.glb">005</option>
+                <option value="/a006.glb">006</option>
+                <option value="/a007.glb">007</option>
+                <option value="/a008.glb">008</option>
+                <option value="/a009.glb">009</option>
+                <option value="/a010.glb">010</option>
+                <option value="/a011.glb">011</option>
+                <option value="/a012.glb">012</option>
+                <option value="/a013.glb">013</option>
+                <option value="/a014.glb">014</option>
+                <option value="/a015.glb">015</option>
+                <option value="/a016.glb">016</option>
+                <option value="/a017.glb">017</option>
+                <option value="/a018.glb">018</option>
+                <option value="/a019.glb">019</option>
+                <option value="/a020.glb">020</option>
+                <option value="/a021.glb">021</option>
+                <option value="/a022.glb">022</option>
+                <option value="/a023.glb">023</option>
+                <option value="/a024.glb">024</option>
+                <option value="/a025.glb">025</option>
             </select><br>
 
             <label for="show-dimensions">Ver dimensiones:</label>
             <input id="show-dimensions" type="checkbox" checked="true">
-            
+
         </div>
     </model-viewer>
     <script src="script.js"></script>
