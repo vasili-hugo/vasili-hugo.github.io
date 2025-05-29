@@ -88,7 +88,7 @@ modelViewer.addEventListener('load', () => {
         position: `${center.x + x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
     });
     modelViewer.querySelector('button[slot="hotspot-dim+X-Y"]').textContent =
-        `${(size.z * 1000).toFixed(1)} mm`;
+        `${(size.z * 1000).toFixed(0)} mm`;
 
     modelViewer.updateHotspot({
         name: 'hotspot-dot+X-Y-Z',
@@ -100,7 +100,7 @@ modelViewer.addEventListener('load', () => {
         position: `${center.x + x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
     });
     modelViewer.querySelector('button[slot="hotspot-dim+X-Z"]').textContent =
-        `${(size.y * 1000).toFixed(1)} mm`;
+        `${(size.y * 1000).toFixed(0)} mm`;
 
     modelViewer.updateHotspot({
         name: 'hotspot-dot+X+Y-Z',
@@ -112,7 +112,7 @@ modelViewer.addEventListener('load', () => {
         position: `${center.x} ${center.y + y2 * 1.1} ${center.z - z2 * 1.1}`
     });
     modelViewer.querySelector('button[slot="hotspot-dim+Y-Z"]').textContent =
-        `${(size.x * 1000).toFixed(1)} mm`;
+        `${(size.x * 1000).toFixed(0)} mm`;
 
     modelViewer.updateHotspot({
         name: 'hotspot-dot-X+Y-Z',
@@ -124,7 +124,7 @@ modelViewer.addEventListener('load', () => {
         position: `${center.x - x2 * 1.2} ${center.y} ${center.z - z2 * 1.2}`
     });
     modelViewer.querySelector('button[slot="hotspot-dim-X-Z"]').textContent =
-        `${(size.y * 1000).toFixed(2)} mm`;
+        `${(size.y * 1000).toFixed(0)} mm`;
 
     modelViewer.updateHotspot({
         name: 'hotspot-dot-X-Y-Z',
@@ -136,7 +136,7 @@ modelViewer.addEventListener('load', () => {
         position: `${center.x - x2 * 1.2} ${center.y - y2 * 1.1} ${center.z}`
     });
     modelViewer.querySelector('button[slot="hotspot-dim-X-Y"]').textContent =
-        `${(size.z * 1000).toFixed(1)} mm`;
+        `${(size.z * 1000).toFixed(0)} mm`;
 
     modelViewer.updateHotspot({
         name: 'hotspot-dot-X-Y+Z',
