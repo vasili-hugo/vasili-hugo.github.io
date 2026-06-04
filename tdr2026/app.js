@@ -8,6 +8,10 @@ from 'three/addons/loaders/GLTFLoader.js';
 
 const viewer = document.getElementById('viewer');
 
+/* -------------------------------------------------- */
+/* ESCENA */
+/* -------------------------------------------------- */
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf3f3f3);
 
@@ -18,8 +22,6 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.set(3, 2, 3);
-
 const renderer = new THREE.WebGLRenderer({
   antialias: true
 });
@@ -29,7 +31,17 @@ renderer.setSize(
   window.innerHeight
 );
 
-viewer.appendChild(renderer.domElement);
+renderer.setPixelRatio(
+  window.devicePixelRatio
+);
+
+viewer.appendChild(
+  renderer.domElement
+);
+
+/* -------------------------------------------------- */
+/* CONTROLES */
+/* -------------------------------------------------- */
 
 const controls = new OrbitControls(
   camera,
@@ -38,12 +50,14 @@ const controls = new OrbitControls(
 
 controls.enableDamping = true;
 
-/* iluminación técnica */
+/* -------------------------------------------------- */
+/* ILUMINACIÓN */
+/* -------------------------------------------------- */
 
 scene.add(
   new THREE.AmbientLight(
     0xffffff,
-    1.2
+    1.4
   )
 );
 
@@ -53,201 +67,331 @@ const light1 =
     1.2
   );
 
-light1.position.set(5,5,5);
+light1.position.set(
+  5,
+  5,
+  5
+);
 
 scene.add(light1);
 
 const light2 =
   new THREE.DirectionalLight(
     0xffffff,
-    0.6
+    0.8
   );
 
-light2.position.set(-5,3,-5);
+light2.position.set(
+  -5,
+  3,
+  -5
+);
 
 scene.add(light2);
 
-/* ejes discretos */
+/* -------------------------------------------------- */
+/* EJES */
+/* -------------------------------------------------- */
 
 const axes =
-  new THREE.AxesHelper(1);
+  new THREE.AxesHelper(0.75);
 
-axes.position.set(-2,-2,-2);
+axes.position.set(
+  -2,
+  -2,
+  -2
+);
 
 scene.add(axes);
 
-/* carga de modelos */
+/* -------------------------------------------------- */
+/* MODELOS */
+/* -------------------------------------------------- */
 
-const loader = new GLTFLoader();
+const loader =
+  new GLTFLoader();
 
 let currentModel = null;
 let edgeLines = null;
 
-function buildSelector() {
+/* pivot central */
 
-  const sel =
-    document.getElementById('modelSelect');
+const pivot =
+  new THREE.Group();
 
-  for(let i=0;i<=24;i++){
+scene.add(pivot);
 
-    const id =
-      String(i).padStart(3,'0');
+/* -------------------------------------------------- */
+/* SELECTOR */
+/* -------------------------------------------------- */
 
-    const opt =
-      document.createElement('option');
+const modelSelect =
+  document.getElementById(
+    'modelSelect'
+  );
 
-    opt.value=id;
-    opt.textContent=`Pieza ${id}`;
+for(let i=0;i<=24;i++){
 
-    sel.appendChild(opt);
-  }
+  const id =
+    String(i).padStart(
+      3,
+      '0'
+    );
+
+  const opt =
+    document.createElement(
+      'option'
+    );
+
+  opt.value = id;
+  opt.textContent =
+    `Pieza ${id}`;
+
+  modelSelect.appendChild(
+    opt
+  );
 }
 
-buildSelector();
+/* -------------------------------------------------- */
+/* CARGA */
+/* -------------------------------------------------- */
 
 function loadModel(id){
 
   const path =
     `models/pieza_${id}.glb`;
 
-  loader.load(path,gltf=>{
+  loader.load(
 
-    if(currentModel)
-      scene.remove(currentModel);
+    path,
 
-    if(edgeLines)
-      scene.remove(edgeLines);
+    (gltf)=>{
 
-    currentModel = gltf.scene;
+      pivot.rotation.set(
+        0,
+        0,
+        0
+      );
 
-    scene.add(currentModel);
+      pivot.scale.set(
+        1,
+        1,
+        1
+      );
 
-    centerModel();
-    buildEdges();
-    updateViewMode();
-  });
+      if(currentModel)
+        pivot.remove(
+          currentModel
+        );
+
+      if(edgeLines)
+        pivot.remove(
+          edgeLines
+        );
+
+      currentModel =
+        gltf.scene;
+
+      centerModel();
+
+      pivot.add(
+        currentModel
+      );
+
+      buildEdges();
+
+      updateViewMode();
+    },
+
+    undefined,
+
+    (err)=>{
+      console.error(err);
+    }
+  );
 }
+
+/* -------------------------------------------------- */
+/* CENTRADO */
+/* -------------------------------------------------- */
 
 function centerModel(){
 
   const box =
     new THREE.Box3()
-      .setFromObject(currentModel);
+      .setFromObject(
+        currentModel
+      );
 
   const center =
     box.getCenter(
       new THREE.Vector3()
     );
 
-  currentModel.position.sub(center);
+  currentModel.position.sub(
+    center
+  );
 
   const size =
     box.getSize(
       new THREE.Vector3()
-    ).length();
+    );
 
-  const dist = size * 1.5;
+  const radius =
+    size.length();
 
   camera.position.set(
-    dist,
-    dist * .7,
-    dist
+    radius * 1.5,
+    radius,
+    radius * 1.5
+  );
+
+  camera.lookAt(
+    0,
+    0,
+    0
+  );
+
+  controls.target.set(
+    0,
+    0,
+    0
   );
 
   controls.update();
 }
+
+/* -------------------------------------------------- */
+/* ARISTAS */
+/* -------------------------------------------------- */
 
 function buildEdges(){
 
   const group =
     new THREE.Group();
 
-  currentModel.traverse(obj=>{
+  currentModel.traverse(
+    (obj)=>{
 
-    if(!obj.isMesh) return;
+      if(!obj.isMesh)
+        return;
 
-    const edges =
-      new THREE.EdgesGeometry(
-        obj.geometry,
-        25
+      const edges =
+        new THREE.EdgesGeometry(
+          obj.geometry,
+          40
+        );
+
+      const lines =
+        new THREE.LineSegments(
+          edges,
+          new THREE.LineBasicMaterial({
+            color:0x222222
+          })
+        );
+
+      lines.position.copy(
+        obj.position
       );
 
-    const lines =
-      new THREE.LineSegments(
-        edges,
-        new THREE.LineBasicMaterial({
-          color:0x222222
-        })
+      lines.rotation.copy(
+        obj.rotation
       );
 
-    lines.position.copy(obj.position);
-    lines.rotation.copy(obj.rotation);
-    lines.scale.copy(obj.scale);
+      lines.scale.copy(
+        obj.scale
+      );
 
-    group.add(lines);
-  });
+      group.add(lines);
+    }
+  );
 
   edgeLines = group;
-  scene.add(edgeLines);
+
+  pivot.add(edgeLines);
 }
 
-/* visualización */
+/* -------------------------------------------------- */
+/* MODOS */
+/* -------------------------------------------------- */
 
 function updateViewMode(){
+
+  if(!currentModel)
+    return;
 
   const mode =
     document.getElementById(
       'viewMode'
     ).value;
 
-  if(!currentModel) return;
+  switch(mode){
 
-  currentModel.visible =
-    mode !== 'wire';
+    case 'solid':
 
-  edgeLines.visible =
-    mode !== 'solid';
+      currentModel.visible =
+        true;
+
+      edgeLines.visible =
+        false;
+
+      break;
+
+    case 'wire':
+
+      currentModel.visible =
+        false;
+
+      edgeLines.visible =
+        true;
+
+      break;
+
+    default:
+
+      currentModel.visible =
+        true;
+
+      edgeLines.visible =
+        true;
+  }
 }
 
 document
-.getElementById('viewMode')
+.getElementById(
+  'viewMode'
+)
 .addEventListener(
   'change',
   updateViewMode
 );
 
-/* selector */
+/* -------------------------------------------------- */
+/* ESCALA */
+/* -------------------------------------------------- */
 
 document
-.getElementById('modelSelect')
-.addEventListener(
-  'change',
-  e => loadModel(e.target.value)
-);
-
-/* escala */
-
-document
-.getElementById('scaleSlider')
+.getElementById(
+  'scaleSlider'
+)
 .addEventListener(
   'input',
-  e => {
-
-    if(!currentModel) return;
+  (e)=>{
 
     const s =
       parseFloat(
         e.target.value
       );
 
-    currentModel.scale.setScalar(s);
-
-    if(edgeLines)
-      edgeLines.scale.setScalar(s);
+    pivot.scale.setScalar(
+      s
+    );
   }
 );
 
-/* fullscreen */
+/* -------------------------------------------------- */
+/* FULLSCREEN */
+/* -------------------------------------------------- */
 
 document
 .getElementById(
@@ -257,28 +401,82 @@ document
   'click',
   ()=>{
 
-    document.body
-      .requestFullscreen();
+    if(
+      !document.fullscreenElement
+    ){
+
+      document.body
+        .requestFullscreen();
+
+    }else{
+
+      document
+        .exitFullscreen();
+    }
   }
 );
 
-/* autorotación */
+/* -------------------------------------------------- */
+/* AUTO ROTACIÓN */
+/* -------------------------------------------------- */
 
 let autoRotate = true;
-let t = 0;
+
+let rotationMode = 'y';
+
+let accumulated = 0;
+
+const ROT_SPEED = 0.01;
+
+let resumeTimeout;
 
 document
-.getElementById('autoBtn')
-.onclick = ()=> autoRotate=true;
+.getElementById(
+  'autoBtn'
+)
+.onclick =
+()=> autoRotate = true;
 
 document
-.getElementById('pauseBtn')
-.onclick = ()=> autoRotate=false;
+.getElementById(
+  'pauseBtn'
+)
+.onclick =
+()=> autoRotate = false;
 
 controls.addEventListener(
   'start',
-  ()=> autoRotate=false
+  ()=>{
+
+    autoRotate = false;
+
+    clearTimeout(
+      resumeTimeout
+    );
+  }
 );
+
+controls.addEventListener(
+  'end',
+  ()=>{
+
+    clearTimeout(
+      resumeTimeout
+    );
+
+    resumeTimeout =
+      setTimeout(
+        ()=>{
+          autoRotate = true;
+        },
+        5000
+      );
+  }
+);
+
+/* -------------------------------------------------- */
+/* ANIMACIÓN */
+/* -------------------------------------------------- */
 
 function animate(){
 
@@ -291,20 +489,43 @@ function animate(){
     autoRotate
   ){
 
-    t += 0.01;
+    if(
+      rotationMode === 'y'
+    ){
 
-    currentModel.rotation.y += 0.005;
+      pivot.rotation.y +=
+        ROT_SPEED;
 
-    currentModel.rotation.x =
-      Math.sin(t*0.5)*0.25;
+      accumulated +=
+        ROT_SPEED;
 
-    if(edgeLines){
+      if(
+        accumulated >=
+        Math.PI * 2
+      ){
 
-      edgeLines.rotation.y =
-        currentModel.rotation.y;
+        accumulated = 0;
 
-      edgeLines.rotation.x =
-        currentModel.rotation.x;
+        rotationMode = 'x';
+      }
+
+    }else{
+
+      pivot.rotation.x +=
+        ROT_SPEED;
+
+      accumulated +=
+        ROT_SPEED;
+
+      if(
+        accumulated >=
+        Math.PI * 2
+      ){
+
+        accumulated = 0;
+
+        rotationMode = 'y';
+      }
     }
   }
 
@@ -318,7 +539,19 @@ function animate(){
 
 animate();
 
-loadModel('000');
+/* -------------------------------------------------- */
+/* EVENTOS */
+/* -------------------------------------------------- */
+
+modelSelect.addEventListener(
+  'change',
+  (e)=>{
+
+    loadModel(
+      e.target.value
+    );
+  }
+);
 
 window.addEventListener(
   'resize',
@@ -336,3 +569,9 @@ window.addEventListener(
     );
   }
 );
+
+/* -------------------------------------------------- */
+/* INICIO */
+/* -------------------------------------------------- */
+
+loadModel('000');
