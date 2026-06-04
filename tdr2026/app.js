@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 
 import { OrbitControls }
-from 'three/addons/controls/OrbitControls.js';
+  from 'three/addons/controls/OrbitControls.js';
 
 import { GLTFLoader }
-from 'three/addons/loaders/GLTFLoader.js';
+  from 'three/addons/loaders/GLTFLoader.js';
 
 const viewer = document.getElementById('viewer');
 
@@ -89,20 +89,25 @@ light2.position.set(
 
 scene.add(light2);
 
+/* pivot central */
+
+/* -------------------------------------------------- */
+/* PIVOT */
+/* -------------------------------------------------- */
+
+const pivot =
+  new THREE.Group();
+
+scene.add(pivot);
+
 /* -------------------------------------------------- */
 /* EJES */
 /* -------------------------------------------------- */
 
 const axes =
-  new THREE.AxesHelper(0.75);
+  new THREE.AxesHelper(1);
 
-axes.position.set(
-  -2,
-  -2,
-  -2
-);
-
-scene.add(axes);
+pivot.add(axes);
 
 /* -------------------------------------------------- */
 /* MODELOS */
@@ -114,12 +119,7 @@ const loader =
 let currentModel = null;
 let edgeLines = null;
 
-/* pivot central */
 
-const pivot =
-  new THREE.Group();
-
-scene.add(pivot);
 
 /* -------------------------------------------------- */
 /* SELECTOR */
@@ -130,7 +130,7 @@ const modelSelect =
     'modelSelect'
   );
 
-for(let i=0;i<=24;i++){
+for (let i = 0; i <= 24; i++) {
 
   const id =
     String(i).padStart(
@@ -156,7 +156,7 @@ for(let i=0;i<=24;i++){
 /* CARGA */
 /* -------------------------------------------------- */
 
-function loadModel(id){
+function loadModel(id) {
 
   const path =
     `models/pieza_${id}.glb`;
@@ -165,7 +165,7 @@ function loadModel(id){
 
     path,
 
-    (gltf)=>{
+    (gltf) => {
 
       pivot.rotation.set(
         0,
@@ -179,12 +179,12 @@ function loadModel(id){
         1
       );
 
-      if(currentModel)
+      if (currentModel)
         pivot.remove(
           currentModel
         );
 
-      if(edgeLines)
+      if (edgeLines)
         pivot.remove(
           edgeLines
         );
@@ -205,7 +205,7 @@ function loadModel(id){
 
     undefined,
 
-    (err)=>{
+    (err) => {
       console.error(err);
     }
   );
@@ -215,7 +215,7 @@ function loadModel(id){
 /* CENTRADO */
 /* -------------------------------------------------- */
 
-function centerModel(){
+function centerModel() {
 
   const box =
     new THREE.Box3()
@@ -265,11 +265,11 @@ function centerModel(){
 /* ARISTAS */
 /* -------------------------------------------------- */
 
-function buildEdges(){
+function buildEdges() {
 
-  currentModel.traverse((obj)=>{
+  currentModel.traverse((obj) => {
 
-    if(!obj.isMesh) return;
+    if (!obj.isMesh) return;
 
     const edges =
       new THREE.EdgesGeometry(
@@ -281,7 +281,7 @@ function buildEdges(){
       new THREE.LineSegments(
         edges,
         new THREE.LineBasicMaterial({
-          color:0x111111
+          color: 0x111111
         })
       );
 
@@ -291,41 +291,41 @@ function buildEdges(){
       edgeLines;
   });
 }
-function applyMaterialMode(mode){
+function applyMaterialMode(mode) {
 
-  currentModel.traverse((obj)=>{
+  currentModel.traverse((obj) => {
 
-    if(!obj.isMesh) return;
+    if (!obj.isMesh) return;
 
-    if(mode==="solid"){
+    if (mode === "solid") {
 
       obj.material = new THREE.MeshStandardMaterial({
 
-        color:0xd8d8d8,
+        color: 0xd8d8d8,
 
-        transparent:false,
-        opacity:1
+        transparent: false,
+        opacity: 1
       });
 
       obj.userData.edgeLines.visible =
         false;
     }
 
-    else if(mode==="mixed"){
+    else if (mode === "mixed") {
 
       obj.material = new THREE.MeshStandardMaterial({
 
-        color:0xd8d8d8,
+        color: 0xd8d8d8,
 
-        transparent:true,
-        opacity:0.10
+        transparent: true,
+        opacity: 0.10
       });
 
       obj.userData.edgeLines.visible =
         true;
     }
 
-    else if(mode==="wire"){
+    else if (mode === "wire") {
 
       obj.material.visible = false;
 
@@ -333,7 +333,7 @@ function applyMaterialMode(mode){
         true;
     }
 
-    else if(mode==="orientation"){
+    else if (mode === "orientation") {
 
       const geom =
         obj.geometry;
@@ -345,7 +345,7 @@ function applyMaterialMode(mode){
 
       const colors = [];
 
-      for(let i=0;i<normals.count;i++){
+      for (let i = 0; i < normals.count; i++) {
 
         const nx =
           Math.abs(
@@ -382,11 +382,11 @@ function applyMaterialMode(mode){
       obj.material =
         new THREE.MeshStandardMaterial({
 
-          vertexColors:true,
+          vertexColors: true,
 
-          transparent:true,
+          transparent: true,
 
-          opacity:0.35
+          opacity: 0.35
         });
 
       obj.userData.edgeLines.visible =
@@ -400,9 +400,9 @@ function applyMaterialMode(mode){
 /* MODOS */
 /* -------------------------------------------------- */
 
-function updateViewMode(){
+function updateViewMode() {
 
-  if(!currentModel) return;
+  if (!currentModel) return;
 
   const mode =
     document.getElementById(
@@ -413,63 +413,63 @@ function updateViewMode(){
 }
 
 document
-.getElementById(
-  'viewMode'
-)
-.addEventListener(
-  'change',
-  updateViewMode
-);
+  .getElementById(
+    'viewMode'
+  )
+  .addEventListener(
+    'change',
+    updateViewMode
+  );
 
 /* -------------------------------------------------- */
 /* ESCALA */
 /* -------------------------------------------------- */
 
 document
-.getElementById(
-  'scaleSlider'
-)
-.addEventListener(
-  'input',
-  (e)=>{
+  .getElementById(
+    'scaleSlider'
+  )
+  .addEventListener(
+    'input',
+    (e) => {
 
-    const s =
-      parseFloat(
-        e.target.value
+      const s =
+        parseFloat(
+          e.target.value
+        );
+
+      pivot.scale.setScalar(
+        s
       );
-
-    pivot.scale.setScalar(
-      s
-    );
-  }
-);
+    }
+  );
 
 /* -------------------------------------------------- */
 /* FULLSCREEN */
 /* -------------------------------------------------- */
 
 document
-.getElementById(
-  'fullscreenBtn'
-)
-.addEventListener(
-  'click',
-  ()=>{
+  .getElementById(
+    'fullscreenBtn'
+  )
+  .addEventListener(
+    'click',
+    () => {
 
-    if(
-      !document.fullscreenElement
-    ){
+      if (
+        !document.fullscreenElement
+      ) {
 
-      document.body
-        .requestFullscreen();
+        document.body
+          .requestFullscreen();
 
-    }else{
+      } else {
 
-      document
-        .exitFullscreen();
+        document
+          .exitFullscreen();
+      }
     }
-  }
-);
+  );
 
 /* -------------------------------------------------- */
 /* AUTO ROTACIÓN */
@@ -486,22 +486,22 @@ const ROT_SPEED = 0.01;
 let resumeTimeout;
 
 document
-.getElementById(
-  'autoBtn'
-)
-.onclick =
-()=> autoRotate = true;
+  .getElementById(
+    'autoBtn'
+  )
+  .onclick =
+  () => autoRotate = true;
 
 document
-.getElementById(
-  'pauseBtn'
-)
-.onclick =
-()=> autoRotate = false;
+  .getElementById(
+    'pauseBtn'
+  )
+  .onclick =
+  () => autoRotate = false;
 
 controls.addEventListener(
   'start',
-  ()=>{
+  () => {
 
     autoRotate = false;
 
@@ -513,7 +513,7 @@ controls.addEventListener(
 
 controls.addEventListener(
   'end',
-  ()=>{
+  () => {
 
     clearTimeout(
       resumeTimeout
@@ -521,7 +521,7 @@ controls.addEventListener(
 
     resumeTimeout =
       setTimeout(
-        ()=>{
+        () => {
           autoRotate = true;
         },
         5000
@@ -533,20 +533,20 @@ controls.addEventListener(
 /* ANIMACIÓN */
 /* -------------------------------------------------- */
 
-function animate(){
+function animate() {
 
   requestAnimationFrame(
     animate
   );
 
-  if(
+  if (
     currentModel &&
     autoRotate
-  ){
+  ) {
 
-    if(
+    if (
       rotationMode === 'y'
-    ){
+    ) {
 
       pivot.rotation.y +=
         ROT_SPEED;
@@ -554,17 +554,17 @@ function animate(){
       accumulated +=
         ROT_SPEED;
 
-      if(
+      if (
         accumulated >=
         Math.PI * 2
-      ){
+      ) {
 
         accumulated = 0;
 
         rotationMode = 'x';
       }
 
-    }else{
+    } else {
 
       pivot.rotation.x +=
         ROT_SPEED;
@@ -572,10 +572,10 @@ function animate(){
       accumulated +=
         ROT_SPEED;
 
-      if(
+      if (
         accumulated >=
         Math.PI * 2
-      ){
+      ) {
 
         accumulated = 0;
 
@@ -600,7 +600,7 @@ animate();
 
 modelSelect.addEventListener(
   'change',
-  (e)=>{
+  (e) => {
 
     loadModel(
       e.target.value
@@ -610,7 +610,7 @@ modelSelect.addEventListener(
 
 window.addEventListener(
   'resize',
-  ()=>{
+  () => {
 
     camera.aspect =
       window.innerWidth /
