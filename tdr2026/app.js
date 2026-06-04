@@ -1,10 +1,10 @@
-import * as THREE from 'https://unpkg.com/three@0.180.0/build/three.module.js';
+import * as THREE from 'three';
 
 import { OrbitControls }
-from 'https://unpkg.com/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+from 'three/addons/controls/OrbitControls.js';
 
 import { GLTFLoader }
-from 'https://unpkg.com/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+from 'three/addons/loaders/GLTFLoader.js';
 
 const viewer = document.getElementById('viewer');
 
