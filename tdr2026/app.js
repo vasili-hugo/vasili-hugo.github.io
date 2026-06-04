@@ -267,49 +267,134 @@ function centerModel(){
 
 function buildEdges(){
 
-  const group =
-    new THREE.Group();
+  currentModel.traverse((obj)=>{
 
-  currentModel.traverse(
-    (obj)=>{
+    if(!obj.isMesh) return;
 
-      if(!obj.isMesh)
-        return;
-
-      const edges =
-        new THREE.EdgesGeometry(
-          obj.geometry,
-          40
-        );
-
-      const lines =
-        new THREE.LineSegments(
-          edges,
-          new THREE.LineBasicMaterial({
-            color:0x222222
-          })
-        );
-
-      lines.position.copy(
-        obj.position
+    const edges =
+      new THREE.EdgesGeometry(
+        obj.geometry,
+        40
       );
 
-      lines.rotation.copy(
-        obj.rotation
+    const edgeLines =
+      new THREE.LineSegments(
+        edges,
+        new THREE.LineBasicMaterial({
+          color:0x111111
+        })
       );
 
-      lines.scale.copy(
-        obj.scale
-      );
+    obj.add(edgeLines);
 
-      group.add(lines);
-    }
-  );
-
-  edgeLines = group;
-
-  pivot.add(edgeLines);
+    obj.userData.edgeLines =
+      edgeLines;
+  });
 }
+function applyMaterialMode(mode){
+
+  currentModel.traverse((obj)=>{
+
+    if(!obj.isMesh) return;
+
+    if(mode==="solid"){
+
+      obj.material = new THREE.MeshStandardMaterial({
+
+        color:0xd8d8d8,
+
+        transparent:false,
+        opacity:1
+      });
+
+      obj.userData.edgeLines.visible =
+        false;
+    }
+
+    else if(mode==="mixed"){
+
+      obj.material = new THREE.MeshStandardMaterial({
+
+        color:0xd8d8d8,
+
+        transparent:true,
+        opacity:0.10
+      });
+
+      obj.userData.edgeLines.visible =
+        true;
+    }
+
+    else if(mode==="wire"){
+
+      obj.material.visible = false;
+
+      obj.userData.edgeLines.visible =
+        true;
+    }
+
+    else if(mode==="orientation"){
+
+      const geom =
+        obj.geometry;
+
+      geom.computeVertexNormals();
+
+      const normals =
+        geom.attributes.normal;
+
+      const colors = [];
+
+      for(let i=0;i<normals.count;i++){
+
+        const nx =
+          Math.abs(
+            normals.getX(i)
+          );
+
+        const ny =
+          Math.abs(
+            normals.getY(i)
+          );
+
+        const nz =
+          Math.abs(
+            normals.getZ(i)
+          );
+
+        colors.push(
+          nx,
+          ny,
+          nz
+        );
+      }
+
+      geom.setAttribute(
+
+        'color',
+
+        new THREE.Float32BufferAttribute(
+          colors,
+          3
+        )
+      );
+
+      obj.material =
+        new THREE.MeshStandardMaterial({
+
+          vertexColors:true,
+
+          transparent:true,
+
+          opacity:0.35
+        });
+
+      obj.userData.edgeLines.visible =
+        true;
+    }
+  });
+}
+
 
 /* -------------------------------------------------- */
 /* MODOS */
@@ -317,44 +402,14 @@ function buildEdges(){
 
 function updateViewMode(){
 
-  if(!currentModel)
-    return;
+  if(!currentModel) return;
 
   const mode =
     document.getElementById(
       'viewMode'
     ).value;
 
-  switch(mode){
-
-    case 'solid':
-
-      currentModel.visible =
-        true;
-
-      edgeLines.visible =
-        false;
-
-      break;
-
-    case 'wire':
-
-      currentModel.visible =
-        false;
-
-      edgeLines.visible =
-        true;
-
-      break;
-
-    default:
-
-      currentModel.visible =
-        true;
-
-      edgeLines.visible =
-        true;
-  }
+  applyMaterialMode(mode);
 }
 
 document
